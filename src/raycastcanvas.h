@@ -85,6 +85,10 @@ public:
     }
 
     std::pair<double, double> getRange(void) {
+        if (! m_raycasting_volume) {
+            return std::make_pair(0.0, 0.0);
+        }
+
         return m_raycasting_volume->range();
     }
 
