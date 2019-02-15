@@ -30,7 +30,8 @@ SOURCES += \
     src/raycastcanvas.cpp \
     src/vtkvolume.cpp \
     src/mesh.cpp \
-    src/raycastvolume.cpp
+    src/raycastvolume.cpp \
+    src/volume.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -38,7 +39,8 @@ HEADERS += \
     src/raycastcanvas.h \
     src/vtkvolume.h \
     src/mesh.h \
-    src/raycastvolume.h
+    src/raycastvolume.h \
+    src/volume.h
 
 INCLUDEPATH += \
     src

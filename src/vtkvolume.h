@@ -25,9 +25,9 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
-#include <tuple>
 #include <vector>
 
+#include "volume.h"
 
 class VTKReadError : public std::runtime_error {
     using std::runtime_error::runtime_error;
@@ -39,7 +39,7 @@ class VTKReadError : public std::runtime_error {
  *
  * This class allows to load a VTK volume from file.
  */
-class VTKVolume {
+class VTKVolume : public Volume {
 
 public:
 
@@ -57,74 +57,22 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~VTKVolume();
+    virtual ~VTKVolume() override;
 
     /*!
      * \brief Load data from file, replacing any current data.
      * \param filename File to be loaded.
      */
-    void load_volume(const std::string& filename);
+    virtual void load_volume(const std::string& filename) override;
 
     /*!
      * \brief Cast the data to `unsigned char` and normalise it to [0, 255];
      */
-    void uint8_normalised(void);
+    virtual void uint8_normalised(void) override;
 
-    /*!
-     * \brief Pointer to the data.
-     */
-    unsigned char * data_ptr(void) {
-        return m_data.data();
-    }
-
-    /*!
-     * \brief Get a copy of the data.
-     */
-    std::vector<unsigned char> data(void) {
-        return m_data;
-    }
-
-    /*!
-     * \brief Range of the image, in intensity value.
-     * \return A pair, holding <minimum, maximum>.
-     */
-    constexpr std::pair<double, double> range(void) const {
-        return m_range;
-    }
-
-    /*!
-     * \brief Range of the image, in intensity value.
-     * \return A pair, holding <minimum, maximum>.
-     */
-    constexpr std::tuple<size_t, size_t, size_t> size(void) const {
-        return m_size;
-    }
-
-    /*!
-     * \brief Range of the image, in intensity value.
-     * \return A pair, holding <minimum, maximum>.
-     */
-    constexpr std::tuple<float, float, float> origin(void) const {
-        return m_origin;
-    }
-
-    /*!
-     * \brief Range of the image, in intensity value.
-     * \return A pair, holding <minimum, maximum>.
-     */
-    constexpr std::tuple<float, float, float> spacing(void) const {
-        return m_spacing;
-    }
 
 private:
-    enum class DataType {Int8, Uint8, Int16, Uint16, Int32, Uint32, Int64, Uint64, Float, Double};
 
-    std::tuple<size_t, size_t, size_t> m_size;    /*!< Number of voxels for each axis. */
-    std::tuple<float, float, float> m_origin;  /*!< Origin, in voxel coordinates. */
-    std::tuple<float, float, float> m_spacing; /*!< Spacing between voxels. */
-    DataType m_datatype;                          /*!< Data type. */
-    std::pair<double, double> m_range;            /*!< (min, max) of the original intensities, before normalisation. */
-    std::vector<unsigned char> m_data;            /*!< Volume data, casted to `unsigned char` and normalised to [0, 255]. */
 
     void read_dimensions(const std::vector<std::string> &header);
     void read_origin(const std::vector<std::string> &header);
