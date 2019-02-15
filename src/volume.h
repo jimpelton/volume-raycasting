@@ -40,7 +40,7 @@ public:
      * \return A pair, holding <minimum, maximum>.
      */
     constexpr std::tuple<size_t, size_t, size_t> size(void) const {
-        return m_size;
+        return _size;
     }
 
     /*!
@@ -48,7 +48,7 @@ public:
      * \return A pair, holding <minimum, maximum>.
      */
     constexpr std::tuple<float, float, float> origin(void) const {
-        return m_origin;
+        return _origin;
     }
 
     /*!
@@ -56,13 +56,13 @@ public:
      * \return A pair, holding <minimum, maximum>.
      */
     constexpr std::tuple<float, float, float> spacing(void) const {
-        return m_spacing;
+        return _spacing;
     }
 
 protected:
-    std::tuple<size_t, size_t, size_t> m_size;    /*!< Number of voxels for each axis. */
-    std::tuple<float, float, float> m_origin;  /*!< Origin, in voxel coordinates. */
-    std::tuple<float, float, float> m_spacing; /*!< Spacing between voxels. */
+    std::tuple<size_t, size_t, size_t> _size;    /*!< Number of voxels for each axis. */
+    std::tuple<float, float, float> _origin;  /*!< Origin, in voxel coordinates. */
+    std::tuple<float, float, float> _spacing; /*!< Spacing between voxels. */
     DataType m_datatype;                          /*!< Data type. */
     std::pair<double, double> m_range;            /*!< (min, max) of the original intensities, before normalisation. */
     std::vector<unsigned char> m_data;            /*!< Volume data, casted to `unsigned char` and normalised to [0, 255]. */

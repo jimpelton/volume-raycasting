@@ -187,7 +187,7 @@ void VTKVolume::read_dimensions(const std::vector<std::string> &header)
             if (3 != std::sscanf(it->c_str(), "%*s %d %d %d", &width, &height, &depth)) {
                 throw VTKReadError("Cannot read volume dimension.");
             }
-            m_size = {width, height, depth};
+            _size = {width, height, depth};
         }
     }
 }
@@ -205,7 +205,7 @@ void VTKVolume::read_origin(const std::vector<std::string> &header)
             if (3 != std::sscanf(it->c_str(), "%*s %f %f %f", &ox, &oy, &oz)) {
                 throw VTKReadError("Cannot read volume origin.");
             }
-            m_origin = {ox, oy, oz};
+            _origin = {ox, oy, oz};
         }
     }
 }
@@ -223,7 +223,7 @@ void VTKVolume::read_spacing(const std::vector<std::string> &header)
             if (3 != std::sscanf(it->c_str(), "%*s %f %f %f", &sx, &sy, &sz)) {
                 throw VTKReadError("Cannot read volume spacing.");
             }
-            m_spacing = {sx, sy, sz};
+            _spacing = {sx, sy, sz};
         }
     }
 }
@@ -335,7 +335,7 @@ void VTKVolume::load_volume(const std::string& filename)
     read_spacing(header);
 
     // Read data
-    size_t element_count = std::get<0>(m_size) * std::get<1>(m_size) * std::get<2>(m_size);
+    size_t element_count = std::get<0>(_size) * std::get<1>(_size) * std::get<2>(_size);
     const bool binary = is_binary(header);
     switch (m_datatype) {
     case VTKVolume::DataType::Int8:
@@ -378,7 +378,7 @@ void VTKVolume::load_volume(const std::string& filename)
  * \brief Cast the data to `unsigned char` and normalise it to [0, 255].
  */
 void VTKVolume::uint8_normalised(void) {
-    size_t element_count = std::get<0>(m_size) * std::get<1>(m_size) * std::get<2>(m_size);
+    size_t element_count = std::get<0>(_size) * std::get<1>(_size) * std::get<2>(_size);
     std::vector<unsigned char> normal_data;
     normal_data.resize(element_count);
 
