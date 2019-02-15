@@ -65,12 +65,24 @@ RayCastCanvas::~RayCastCanvas()
 }
 
 
+namespace  {
+    void debugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
+                              GLsizei length, const GLchar *message, const void *userParam) {
+        qDebug() << "Source: " << source << "Message: " << message;
+    }
+}
+
 /*!
  * \brief Initialise OpenGL-related state.
  */
 void RayCastCanvas::initializeGL()
 {
     initializeOpenGLFunctions();
+    QString debugMode = QProcessEnvironment::systemEnvironment().value("RAYCAST_DEBUG");
+    if (!debugMode.isEmpty()) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(&debugMessageCallback, nullptr);
+    }
 
     m_raycasting_volume = new RayCastVolume();
     m_raycasting_volume->create_noise();

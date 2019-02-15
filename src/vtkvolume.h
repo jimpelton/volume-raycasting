@@ -39,7 +39,7 @@ class VTKReadError : public std::runtime_error {
  *
  * This class allows to load a VTK volume from file.
  */
-class VTKVolume : public Volume {
+class VTKVolume : public VolumeData {
 
 public:
 
@@ -70,10 +70,7 @@ public:
      */
     virtual void uint8_normalised(void) override;
 
-
 private:
-
-
     void read_dimensions(const std::vector<std::string> &header);
     void read_origin(const std::vector<std::string> &header);
     void read_spacing(const std::vector<std::string> &header);

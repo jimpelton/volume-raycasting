@@ -26,6 +26,7 @@
 #include <vector>
 
 #include <QtMath>
+#include <QString>
 
 #include <QOpenGLWidget>
 #include <QOpenGLExtraFunctions>

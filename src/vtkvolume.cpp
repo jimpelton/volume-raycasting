@@ -247,34 +247,34 @@ void VTKVolume::read_data_type(const std::vector<std::string> &header)
             const std::string s(buffer);
 
             if (s == "unsigned_char") {
-                m_datatype = DataType::Uint8;
+                _datatype = DataType::Uint8;
             }
             else if (s == "char") {
-                m_datatype = DataType::Int8;
+                _datatype = DataType::Int8;
             }
             else if (s == "unsigned_short") {
-                m_datatype = DataType::Uint16;
+                _datatype = DataType::Uint16;
             }
             else if (s == "short") {
-                m_datatype = DataType::Int16;
+                _datatype = DataType::Int16;
             }
             else if (s == "unsigned_int") {
-                m_datatype = DataType::Uint32;
+                _datatype = DataType::Uint32;
             }
             else if (s == "int") {
-                m_datatype = DataType::Int32;
+                _datatype = DataType::Int32;
             }
             else if (s == "unsigned_long") {
-                m_datatype = DataType::Uint64;
+                _datatype = DataType::Uint64;
             }
             else if (s == "long") {
-                m_datatype = DataType::Int64;
+                _datatype = DataType::Int64;
             }
             else if (s == "float") {
-                m_datatype = DataType::Float;
+                _datatype = DataType::Float;
             }
             else if (s == "double") {
-                m_datatype = DataType::Double;
+                _datatype = DataType::Double;
             }
             else {
                 throw VTKReadError("Unsupported volume data type.");
@@ -337,36 +337,36 @@ void VTKVolume::load_volume(const std::string& filename)
     // Read data
     size_t element_count = std::get<0>(_size) * std::get<1>(_size) * std::get<2>(_size);
     const bool binary = is_binary(header);
-    switch (m_datatype) {
+    switch (_datatype) {
     case VTKVolume::DataType::Int8:
-        read_data<char>(file, binary, element_count, m_data, m_range);
+        read_data<char>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Uint8:
-        read_data<unsigned char>(file, binary, element_count, m_data, m_range);
+        read_data<unsigned char>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Int16:
-        read_data<unsigned short>(file, binary, element_count, m_data, m_range);
+        read_data<unsigned short>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Uint16:
-        read_data<short>(file, binary, element_count, m_data, m_range);
+        read_data<short>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Int32:
-        read_data<unsigned int>(file, binary, element_count, m_data, m_range);
+        read_data<unsigned int>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Uint32:
-        read_data<int>(file, binary, element_count, m_data, m_range);
+        read_data<int>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Int64:
-        read_data<unsigned long>(file, binary, element_count, m_data, m_range);
+        read_data<unsigned long>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Uint64:
-        read_data<long>(file, binary, element_count, m_data, m_range);
+        read_data<long>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Float:
-        read_data<float>(file, binary, element_count, m_data, m_range);
+        read_data<float>(file, binary, element_count, _data, _range);
         break;
     case VTKVolume::DataType::Double:
-        read_data<double>(file, binary, element_count, m_data, m_range);
+        read_data<double>(file, binary, element_count, _data, _range);
         break;
     }
 
@@ -382,39 +382,39 @@ void VTKVolume::uint8_normalised(void) {
     std::vector<unsigned char> normal_data;
     normal_data.resize(element_count);
 
-    switch (m_datatype) {
+    switch (_datatype) {
     case VTKVolume::DataType::Int8:
-        cast_and_normalise<char>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<char>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Uint8:
-        cast_and_normalise<unsigned char>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<unsigned char>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Int16:
-        cast_and_normalise<short>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<short>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Uint16:
-        cast_and_normalise<unsigned short>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<unsigned short>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Int32:
-        cast_and_normalise<int>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<int>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Uint32:
-        cast_and_normalise<unsigned int>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<unsigned int>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Int64:
-        cast_and_normalise<long>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<long>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Uint64:
-        cast_and_normalise<unsigned long>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<unsigned long>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Float:
-        cast_and_normalise<float>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<float>(_data, _range, normal_data, element_count);
         break;
     case VTKVolume::DataType::Double:
-        cast_and_normalise<double>(m_data, m_range, normal_data, element_count);
+        cast_and_normalise<double>(_data, _range, normal_data, element_count);
         break;
     }
 
-    m_data = std::move(normal_data);
-    m_datatype = DataType::Uint8;
+    _data = std::move(normal_data);
+    _datatype = DataType::Uint8;
 }

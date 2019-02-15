@@ -122,6 +122,7 @@ void MainWindow::on_loadVolume_clicked()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Open volume"), ".", tr("VTK images (*.vtk)"));
     if (!path.isNull()) {
+        qDebug() << path;
         load_volume(path);
     }
 }

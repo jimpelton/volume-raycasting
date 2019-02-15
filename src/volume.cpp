@@ -1,4 +1,4 @@
 
 #include "volume.h"
 
-Volume::~Volume() noexcept { }
+VolumeData::~VolumeData() noexcept { }

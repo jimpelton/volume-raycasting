@@ -5,9 +5,9 @@
 #include <vector>
 #include <tuple>
 
-class Volume {
+class VolumeData {
 public:
-    virtual ~Volume();
+    virtual ~VolumeData() noexcept;
     virtual void load_volume(const std::string &filename) = 0;
     virtual void uint8_normalised(void) = 0;
 
@@ -17,14 +17,14 @@ public:
      * \brief Pointer to the data.
      */
     unsigned char * data_ptr(void) {
-        return m_data.data();
+        return _data.data();
     }
 
     /*!
      * \brief Get a copy of the data.
      */
     std::vector<unsigned char> data(void) {
-        return m_data;
+        return _data;
     }
 
     /*!
@@ -32,7 +32,7 @@ public:
      * \return A pair, holding <minimum, maximum>.
      */
     constexpr std::pair<double, double> range(void) const {
-        return m_range;
+        return _range;
     }
 
     /*!
@@ -63,9 +63,9 @@ protected:
     std::tuple<size_t, size_t, size_t> _size;    /*!< Number of voxels for each axis. */
     std::tuple<float, float, float> _origin;  /*!< Origin, in voxel coordinates. */
     std::tuple<float, float, float> _spacing; /*!< Spacing between voxels. */
-    DataType m_datatype;                          /*!< Data type. */
-    std::pair<double, double> m_range;            /*!< (min, max) of the original intensities, before normalisation. */
-    std::vector<unsigned char> m_data;            /*!< Volume data, casted to `unsigned char` and normalised to [0, 255]. */
+    DataType _datatype;                          /*!< Data type. */
+    std::pair<double, double> _range;            /*!< (min, max) of the original intensities, before normalisation. */
+    std::vector<unsigned char> _data;            /*!< Volume data, casted to `unsigned char` and normalised to [0, 255]. */
 };
 
 #endif // VOLUME_H
