@@ -12,6 +12,9 @@ void RawVolume::load_volume(const std::string &filename) {
         throw RawFileReadError("Cannot open file.");
     }
 
+    std::vector<char> rawFile;
+
+
 
 }
 
