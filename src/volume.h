@@ -7,6 +7,11 @@
 
 class VolumeData {
 public:
+    VolumeData();
+    VolumeData(std::tuple<size_t, size_t, size_t> size,
+               std::tuple<float, float, float> spacing,
+               std::tuple<float, float, float> origin);
+
     virtual ~VolumeData() noexcept;
     virtual void load_volume(const std::string &filename) = 0;
     virtual void uint8_normalised(void) = 0;

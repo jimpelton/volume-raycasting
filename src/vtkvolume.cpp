@@ -29,6 +29,8 @@
 #include <limits.h>
 
 #include "vtkvolume.h"
+#include "readerror.h"
+#include "util.h"
 
 
 /*!
@@ -57,124 +59,8 @@ VTKVolume::~VTKVolume()
 }
 
 
-/*!
- * \brief Check whether the architecture is little endian.
- * \return `true` if little endian, `false` if big endian.
- */
-static bool is_little_endian()
-{
-    union {
-        unsigned long l;
-        unsigned char c[sizeof(unsigned long)];
-    } x;
-    x.l = 1;
-    return x.c[0] == 1;
-}
-
 
 /*!
- * \brief Invert the endianness of the input value.
- * \param p Pointer to the first byte of an input value of size `N`.
- */
-template<size_t N>
-void swap_byte_order(unsigned char* p)
-{
-    unsigned char tmp;
-    for (size_t i = 0; i < N / 2; ++i) {
-        tmp = p[i];
-        p[i] = p[N-i-1];
-        p[N-i-1] = tmp;
-    }
-}
-
-
-/*!
- * \brief Check if a VTK file is binary.
- * \param header Header lines of the file.
- * \return `true` if binary.
- */
-static bool is_binary(const std::vector<std::string> &header)
-{
-    for (auto it = header.begin(); it != header.end(); ++it) {
-        if (it->substr(0, 6) == "BINARY") {
-            return true;
-        }
-        else if (it->substr(0, 5) == "ASCII") {
-            return false;
-        }
-    }
-    throw VTKReadError("Cannot read file format.");
-}
-
-
-/*!
- * \brief Read VTK data from file.
- * \param file Stream from the open file.
- * \param image_data Array of `unisgned char` to store the resulting data of type `T`.
- * \param binary Whether the VTK file is binary.
- * \param element_count Number of elements to read.
- * \return The range of the read data.
- */
-template<typename T>
-static void read_data(std::ifstream& file, const bool binary, const size_t element_count, std::vector<unsigned char>& image_data, std::pair<double, double>& range) {
-
-    std::vector<T> data;
-    data.resize(element_count);
-
-    if (binary) {
-        file.read(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(sizeof (T) * element_count));
-        if (is_little_endian() && sizeof (T) > 1) {
-            for (size_t i = 0; i < element_count; ++i) {
-                swap_byte_order<sizeof (T)>(reinterpret_cast<unsigned char*>(data.data() + i));
-            }
-        }
-    }
-    else {
-        T voxel;
-        for (size_t i = 0; i < element_count; ++i) {
-            file >> voxel;
-            data.push_back(voxel);
-        }
-    }
-
-    // Find range
-    range = {std::numeric_limits<double>::max(), std::numeric_limits<double>::min()};
-    for (size_t i = 0; i < element_count; ++i) {
-        if (data[i] > range.second) {
-            range.second = data[i];
-        }
-        if (data[i] < range.first) {
-            range.first = data[i];
-        }
-    }
-
-    size_t size = data.size() * sizeof (data[0]);
-    image_data.clear();
-    image_data.resize(size);
-    std::memcpy(image_data.data(), reinterpret_cast<char*>(data.data()), size);
-}
-
-
-/*!
- * \brief Cast the data to `unsigned char`, and normalise its range to [0,255].
- * \param data Input data of type `T`.
- * \param range Range of the input data.
- * \param normal_data Array to store the resulting normalised data.
- * \param element_count Number of input elements.
- */
-template<typename T>
-void cast_and_normalise(std::vector<unsigned char>& data, const std::pair<double, double>& range, std::vector<unsigned char>& normal_data, const size_t element_count) {
-    auto *p = reinterpret_cast<T*>(data.data());
-
-    // Normalise and cast
-    normal_data.clear();
-    normal_data.resize(element_count);
-    for (size_t i = 0; i < element_count; ++i) {
-        normal_data[i] = static_cast<unsigned char>(255 * (static_cast<double>(p[i]) - range.first) / (range.second - range.first));
-    }
-}
-
-
 /*!
  * \brief Read the dimensions from a VTK header.
  * \param header Lines of the VTK header.
@@ -185,7 +71,7 @@ void VTKVolume::read_dimensions(const std::vector<std::string> &header)
         if (it->substr(0, 10) == "DIMENSIONS") {
             int width, height, depth;
             if (3 != std::sscanf(it->c_str(), "%*s %d %d %d", &width, &height, &depth)) {
-                throw VTKReadError("Cannot read volume dimension.");
+                throw ReadError("Cannot read volume dimension.");
             }
             _size = {width, height, depth};
         }
@@ -203,7 +89,7 @@ void VTKVolume::read_origin(const std::vector<std::string> &header)
         if (it->substr(0, 6) == "ORIGIN") {
             float ox, oy, oz;
             if (3 != std::sscanf(it->c_str(), "%*s %f %f %f", &ox, &oy, &oz)) {
-                throw VTKReadError("Cannot read volume origin.");
+                throw ReadError("Cannot read volume origin.");
             }
             _origin = {ox, oy, oz};
         }
@@ -221,7 +107,7 @@ void VTKVolume::read_spacing(const std::vector<std::string> &header)
         if (it->substr(0, 7) == "SPACING") {
             float sx, sy, sz;
             if (3 != std::sscanf(it->c_str(), "%*s %f %f %f", &sx, &sy, &sz)) {
-                throw VTKReadError("Cannot read volume spacing.");
+                throw ReadError("Cannot read volume spacing.");
             }
             _spacing = {sx, sy, sz};
         }
@@ -242,7 +128,7 @@ void VTKVolume::read_data_type(const std::vector<std::string> &header)
         if (it->substr(0, 7) == "SCALARS") {
             char buffer[30];
             if (1 != std::sscanf(it->c_str(), "%*s %*s %s", buffer)) {
-                throw VTKReadError("Cannot read volume data type.");
+                throw ReadError("Cannot read volume data type.");
             }
             const std::string s(buffer);
 
@@ -277,7 +163,7 @@ void VTKVolume::read_data_type(const std::vector<std::string> &header)
                 _datatype = DataType::Double;
             }
             else {
-                throw VTKReadError("Unsupported volume data type.");
+                throw ReadError("Unsupported volume data type.");
             }
         }
     }
@@ -293,7 +179,7 @@ void VTKVolume::load_volume(const std::string& filename)
     // Open file
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
-        throw VTKReadError("Cannot open file.");
+        throw ReadError("Cannot open file.");
     }
 
     // Read VTK header
@@ -315,7 +201,7 @@ void VTKVolume::load_volume(const std::string& filename)
         std::getline(file, line);
         if (line.empty()) {
             file.close();
-            throw VTKReadError("Cannot read header, missing line " + std::to_string(i + 1) + ".");
+            throw ReadError("Cannot read header, missing line " + std::to_string(i + 1) + ".");
         }
         else {
             header.push_back(line);
@@ -325,7 +211,7 @@ void VTKVolume::load_volume(const std::string& filename)
     // Check magic number
     if (header[0].substr(0, 5) != "# vtk") {
         file.close();
-        throw VTKReadError("Not a valid VTK file.");
+        throw ReadError("Not a valid VTK file.");
     }
 
     // Read metadata

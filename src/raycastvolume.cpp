@@ -23,6 +23,7 @@
 
 #include "raycastvolume.h"
 #include "vtkvolume.h"
+#include "rawvolume.h"
 
 #include <QRegularExpression>
 
@@ -99,6 +100,14 @@ void RayCastVolume::load_volume(const QString& filename) {
     if ("vtk" == extension) {
         VTKVolume volume {filename.toStdString()};
         volume.uint8_normalised();
+        m_size = QVector3D(std::get<0>(volume.size()), std::get<1>(volume.size()), std::get<2>(volume.size()));
+        m_origin = QVector3D(std::get<0>(volume.origin()), std::get<1>(volume.origin()), std::get<2>(volume.origin()));
+        m_spacing = QVector3D(std::get<0>(volume.spacing()), std::get<1>(volume.spacing()), std::get<2>(volume.spacing()));
+        m_range = volume.range();
+        data = volume.data();
+    } else if ("raw" == extension) {
+        RawVolume volume{{478, 616, 490}, {1.0, 1.0, 1.0}, {0.0, 0.0, 0.0}};
+        volume.load_volume(filename.toStdString());
         m_size = QVector3D(std::get<0>(volume.size()), std::get<1>(volume.size()), std::get<2>(volume.size()));
         m_origin = QVector3D(std::get<0>(volume.origin()), std::get<1>(volume.origin()), std::get<2>(volume.origin()));
         m_spacing = QVector3D(std::get<0>(volume.spacing()), std::get<1>(volume.spacing()), std::get<2>(volume.spacing()));

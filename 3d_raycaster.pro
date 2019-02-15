@@ -32,7 +32,8 @@ SOURCES += \
     src/mesh.cpp \
     src/raycastvolume.cpp \
     src/volume.cpp \
-    src/rawvolume.cpp
+    src/rawvolume.cpp \
+    src/util.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -42,7 +43,9 @@ HEADERS += \
     src/mesh.h \
     src/raycastvolume.h \
     src/volume.h \
-    src/rawvolume.h
+    src/rawvolume.h \
+    src/util.h \
+    src/readerror.h
 
 INCLUDEPATH += \
     src
